@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Traffic Officer Dashboard | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">Traffic officer workspace</span><h1>Hello, {{ user.first_name|default:user.username }}.</h1><p class="lead">Your secure RoadGuard officer account is ready to use.</p></div><span class="role-pill">Traffic Officer</span></div>
+<div class="content-grid">
+  <section class="panel"><span class="eyebrow">Available now</span><h2>My profile</h2><p>Review or update your own name, email address, and contact number.</p><a class="button button-primary" href="{% url 'profile' %}">View my profile</a></section>
+  <section class="panel"><span class="eyebrow">Planned features</span><h2>Traffic management</h2><p>Camera monitoring, possible violation review, vehicle records, alerts, and reporting belong to the approved future modules. They are not active in this account-feature release.</p></section>
+</div>
+<div class="notice"><strong>Human verification is required.</strong> The future monitoring prototype is designed to support officer review rather than automatically issue legal traffic tickets or fines.</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Log in | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="auth-layout">
+  <section class="auth-aside">
+    <span class="eyebrow">Secure sign-in</span>
+    <h1>Welcome back to RoadGuard.</h1>
+    <p>Access the dashboard intended for your assigned role. Every protected page requires an authenticated session.</p>
+  </section>
+  <section class="panel auth-panel" aria-labelledby="login-heading">
+    <h2 id="login-heading">Log in</h2>
+    <p class="muted">Enter your username and password to continue.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-error-block" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+      <div class="form-field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      {% endfor %}
+      <button class="button button-primary form-submit" type="submit">Log in</button>
+    </form>
+    <p class="auth-footnote">No account? <a href="{% url 'register' %}">Register as a Traffic Officer</a>.</p>
+  </section>
+</div>
+{% endblock %}

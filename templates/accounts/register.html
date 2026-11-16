@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Register | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="auth-layout">
+  <section class="auth-aside">
+    <span class="eyebrow">Account Management</span>
+    <h1>Create a traffic officer account.</h1>
+    <p>Complete all fields below. New registrations receive the Traffic Officer role; administrators are provisioned separately through a secured management command.</p>
+    <div class="role-hint"><strong>Role assigned</strong><span>Traffic Officer</span></div>
+  </section>
+  <section class="panel auth-panel" aria-labelledby="register-heading">
+    <h2 id="register-heading">Registration</h2>
+    <p class="muted">Already registered? <a href="{% url 'login' %}">Log in here</a>.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-error-block">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="form-grid">
+        {% for field in form %}
+        <div class="form-field {% if field.name == 'password1' or field.name == 'password2' %}full-width{% endif %}">
+          <label for="{{ field.id_for_label }}">{{ field.label }} <span aria-hidden="true">*</span></label>
+          {{ field }}
+          {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          {% if field.help_text %}<div class="field-help">{{ field.help_text|safe }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <button class="button button-primary form-submit" type="submit">Create account</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

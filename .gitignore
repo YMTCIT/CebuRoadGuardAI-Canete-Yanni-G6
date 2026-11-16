@@ -1,0 +1,24 @@
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Python environments and caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Local test database and generated files
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

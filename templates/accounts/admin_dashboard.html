@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Administrator Dashboard | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">Administrator workspace</span><h1>Welcome, {{ user.first_name|default:user.username }}.</h1><p class="lead">Manage account access and oversee the RoadGuard prototype.</p></div><span class="role-pill role-admin">Administrator</span></div>
+<div class="stats-grid">
+  <article class="stat"><div class="small-label">TRAFFIC OFFICER ACCOUNTS</div><strong>{{ officer_count }}</strong><p>Registered officer users</p></article>
+  <article class="stat"><div class="small-label">ADMINISTRATORS</div><strong>{{ admin_count }}</strong><p>Authorized administrator accounts</p></article>
+  <article class="stat"><div class="small-label">CURRENT MODULE</div><strong class="stat-text">Accounts</strong><p>Authentication and role access</p></article>
+</div>
+<div class="content-grid">
+  <section class="panel"><h2>Account administration</h2><p>Use Django's permission-protected administrative interface to manage registered accounts and their assigned roles.</p><a class="button button-primary" href="{% url 'admin:index' %}">Open account administration</a></section>
+  <section class="panel"><h2>Future RoadGuard modules</h2><ul class="feature-list"><li>Traffic monitoring dashboard <em>Planned</em></li><li>Violation and vehicle incident review <em>Planned</em></li><li>Cebu road locations and alerts <em>Planned</em></li><li>Report generation <em>Planned</em></li></ul></section>
+</div>
+{% endblock %}

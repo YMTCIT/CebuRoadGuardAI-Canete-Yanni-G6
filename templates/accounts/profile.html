@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}My Profile | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">Account Management</span><h1>My profile</h1><p class="lead">Your changes affect only your own account.</p></div><a class="button button-outline" href="{% url 'dashboard' %}">Back to dashboard</a></div>
+<div class="profile-layout">
+  <aside class="panel identity-panel"><div class="avatar" aria-hidden="true">{{ user.username|first|upper }}</div><h2>{{ user.get_full_name|default:user.username }}</h2><p class="muted">@{{ user.username }}</p><span class="role-pill {% if user.is_roadguard_admin %}role-admin{% endif %}">{{ user.get_role_display }}</span><p class="subtle">Username and role are controlled through account administration and cannot be changed here.</p></aside>
+  <section class="panel" aria-labelledby="edit-heading"><h2 id="edit-heading">Edit account details</h2><form method="post" novalidate>{% csrf_token %}{% if form.non_field_errors %}<div class="form-error-block">{{ form.non_field_errors }}</div>{% endif %}<div class="form-grid">{% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }} <span aria-hidden="true">*</span></label>{{ field }}{% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>{% endfor %}</div><button class="button button-primary form-submit" type="submit">Save changes</button></form></section>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Welcome | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<section class="hero" aria-labelledby="hero-heading">
+  <div>
+    <span class="eyebrow">Cebu-based traffic monitoring concept</span>
+    <h1 id="hero-heading">A clearer way to review potential road incidents.</h1>
+    <p class="lead">Cebu RoadGuard AI is a prototype for authorized traffic personnel. The planned system brings together road monitoring, human-verified violation records, alerts, and reports.</p>
+    <div class="actions">
+      <a class="button button-primary" href="{% url 'login' %}">Log in to your account</a>
+      <a class="button button-outline" href="{% url 'register' %}">Create officer account</a>
+    </div>
+  </div>
+  <aside class="hero-panel" aria-label="Prototype principles">
+    <div class="small-label">PROJECT PRINCIPLES</div>
+    <div class="principle"><span class="principle-icon">01</span><span>Authorized accounts only</span></div>
+    <div class="principle"><span class="principle-icon">02</span><span>Human review before confirmation</span></div>
+    <div class="principle"><span class="principle-icon">03</span><span>Selected Cebu road locations</span></div>
+    <p class="subtle">Only the account-management feature is implemented in this version. Monitoring modules are planned for later development.</p>
+  </aside>
+</section>
+{% endblock %}

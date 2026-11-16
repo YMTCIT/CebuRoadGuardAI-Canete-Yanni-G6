@@ -1,0 +1,52 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cebu RoadGuard AI - account management prototype">
+  <title>{% block title %}Cebu RoadGuard AI{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="Cebu RoadGuard AI home">
+        <span class="brand-mark" aria-hidden="true">RG</span>
+        <span><strong>Cebu RoadGuard AI</strong><small>Traffic monitoring prototype</small></span>
+      </a>
+      <nav aria-label="Primary navigation" class="nav-links">
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'profile' %}">My profile</a>
+          <form action="{% url 'logout' %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <button class="nav-logout" type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Log in</a>
+          <a class="nav-button" href="{% url 'register' %}">Register</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell main-content">
+    {% if messages %}
+      <div class="flash-group" aria-live="polite">
+      {% for message in messages %}
+        <div class="flash flash-{{ message.tags|default:'info' }}" role="status">{{ message }}</div>
+      {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <span>Cebu RoadGuard AI</span>
+      <span>School-project prototype &middot; Selected Cebu roads only</span>
+    </div>
+  </footer>
+</body>
+</html>
