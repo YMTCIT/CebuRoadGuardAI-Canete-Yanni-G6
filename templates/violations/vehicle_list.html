@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Vehicle records | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">1.3.3 Vehicle Record Management</span><h1>Vehicle records</h1><p class="lead">Store plate identifiers, search records, and access linked incident history.</p></div><a class="button button-primary" href="{% url 'violations:vehicle_create' %}">+ Add vehicle</a></div>
+<section class="panel">
+  <form method="get" class="filter-bar"><label class="filter-label" for="vehicle-query">Plate or notes</label><input id="vehicle-query" name="q" value="{{ query }}" maxlength="100" placeholder="Search vehicles"><button class="button button-outline" type="submit">Search</button><a class="button button-outline" href="{% url 'violations:vehicle_list' %}">Reset</a></form>
+  <div class="table-scroll"><table class="data-table"><thead><tr><th>Plate / identifier</th><th>Recorded by</th><th>Created</th><th>Details</th></tr></thead><tbody>
+  {% for vehicle in vehicles %}<tr><td><strong>{{ vehicle.plate_number }}</strong></td><td>{{ vehicle.created_by.username }}</td><td>{{ vehicle.created_at|date:'M d, Y' }}</td><td><a href="{% url 'violations:vehicle_detail' vehicle.pk %}">View record</a></td></tr>
+  {% empty %}<tr><td colspan="4" class="empty-state">No vehicle records found. <a href="{% url 'violations:vehicle_create' %}">Create your first record</a>.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<div class="notice"><strong>Privacy:</strong> Officers see only their records. Administrators can view all recorded vehicles, but only the original creator can modify them.</div>
+{% endblock %}

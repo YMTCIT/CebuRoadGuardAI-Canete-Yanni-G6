@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}Administrator Dashboard | Cebu RoadGuard AI{% endblock %}
 {% block content %}
-<div class="page-head"><div><span class="eyebrow">Administrator workspace</span><h1>Welcome, {{ user.first_name|default:user.username }}.</h1><p class="lead">Manage account access and oversee the RoadGuard prototype.</p></div><span class="role-pill role-admin">Administrator</span></div>
+<div class="page-head"><div><span class="eyebrow">Administrator workspace</span><h1>Welcome, {{ user.first_name|default:user.username }}.</h1><p class="lead">Manage user accounts and oversee pending suspected traffic incidents.</p></div><span class="role-pill role-admin">Administrator</span></div>
 <div class="stats-grid">
-  <article class="stat"><div class="small-label">TRAFFIC OFFICER ACCOUNTS</div><strong>{{ officer_count }}</strong><p>Registered officer users</p></article>
-  <article class="stat"><div class="small-label">ADMINISTRATORS</div><strong>{{ admin_count }}</strong><p>Authorized administrator accounts</p></article>
-  <article class="stat"><div class="small-label">CURRENT MODULE</div><strong class="stat-text">Accounts</strong><p>Authentication and role access</p></article>
+  <article class="stat"><div class="small-label">PENDING REVIEW</div><strong>{{ pending_count }}</strong><p>Recorded suspected incidents</p></article>
+  <article class="stat"><div class="small-label">VEHICLE RECORDS</div><strong>{{ vehicle_count }}</strong><p>Saved vehicle identifiers</p></article>
+  <article class="stat"><div class="small-label">OFFICER ACCOUNTS</div><strong>{{ officer_count }}</strong><p>Registered authorized users</p></article>
 </div>
 <div class="content-grid">
-  <section class="panel"><h2>Account administration</h2><p>Use Django's permission-protected administrative interface to manage registered accounts and their assigned roles.</p><a class="button button-primary" href="{% url 'admin:index' %}">Open account administration</a></section>
-  <section class="panel"><h2>Future RoadGuard modules</h2><ul class="feature-list"><li>Traffic monitoring dashboard <em>Planned</em></li><li>Violation and vehicle incident review <em>Planned</em></li><li>Cebu road locations and alerts <em>Planned</em></li><li>Report generation <em>Planned</em></li></ul></section>
+  <section class="panel"><span class="eyebrow">Available now</span><h2>Incident detection and vehicle records</h2><p>Search incidents, inspect simulated detections, and view vehicle histories.</p><div class="actions"><a class="button button-primary" href="{% url 'violations:incident_list' %}">View incidents</a><a class="button button-outline" href="{% url 'violations:vehicle_list' %}">View vehicles</a></div></section>
+  <section class="panel"><span class="eyebrow">Access control</span><h2>Account administration</h2><p>Manage authorized accounts in Django's staff-protected administration interface.</p><a class="button button-outline" href="{% url 'admin:index' %}">Manage accounts</a></section>
 </div>
+<div class="notice"><strong>Prototype only.</strong> Simulated detections are academic test records, not automatically observed violations or enforceable citations.</div>
 {% endblock %}

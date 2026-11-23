@@ -1,152 +1,132 @@
-# Cebu RoadGuard AI - Account Feature
+# Cebu RoadGuard AI — Project Development 2
 
-A Django account-management prototype for **Cebu RoadGuard AI**, intended for authorized traffic personnel monitoring selected roads in Cebu. This release implements only the required **Account Feature**: registration, login/logout, role-based dashboards, and personal profile management. Camera monitoring, simulated violation detection, vehicle incident records, human review, alerts, and reporting are **planned modules, not working features in this release**.
+This release **continues the existing Project Development 1 Django application** and implements all four features of the approved **1.3 Violation Management** WBS. Its normal database is the same **Supabase PostgreSQL** instance used for account management.
 
-## Implemented features
+**Project repository:** https://github.com/YMTCIT/CebuRoadGuardAI-Canete-Yanni-G6
 
-| Requirement | Implementation |
+## Features at a glance
+
+| WBS | Working end-to-end workflow |
 | --- | --- |
-| Registration | Required first/last name, username, unique email, contact number, password and matching confirmation; success/error messages. |
-| Secure passwords | Django's built-in `UserCreationForm` and hashing system; no plaintext passwords stored. |
-| Login and logout | Django authentication and sessions, invalid-login errors, POST-only logout with CSRF protection. |
-| Role dashboards | `Administrator` and `Traffic Officer`, with separate pages and server-side authorization (403 on cross-role access). |
-| Profile | Authenticated user can view/edit **only their own** name, email, and contact number. |
-| Database | Supabase **PostgreSQL** with Django ORM; `.env` holds the server-only connection URL. |
+| 1.3.1 Violation Detection | Manual sample entry or an explicitly simulated detection, capture details and evidence notes, save a pending incident, search and filter incidents, edit/delete own pending records. |
+| 1.3.2 Violation Review | Administrator-only review queue with violation-type filtering, incident evidence, approve/reject with required reasons, permanent review fields, separate verified-violation record for approvals. |
+| 1.3.3 Vehicle Record Management | Create, list, search, filter, view, edit and delete unlinked vehicle records. Each incident references a vehicle record. |
+| 1.3.4 Alert Notification | New pending incidents notify active administrators; decisions notify incident creators. Authenticated recipients read/mark-read/delete their in-app notifications. |
+| PD1 Account Management | Registration, login/logout, Administrator and Traffic Officer dashboards, user profiles, Django password hashing and ownership restrictions remain working. |
 
-**Role policy:** Public self-registration is **Traffic Officer only** and cannot assign staff or administrator privileges. Administrator accounts are created using `python manage.py createsuperuser`. The Administrator dashboard additionally requires `is_staff=True`.
+### Safety and prototype boundaries
 
-> This prototype does not issue legal citations, implement fine payments or a driver portal, or connect to LTO/police databases. No traffic incidents are generated or invented by its dashboards.
+- The application **does not run an AI model**, consume a live camera feed, detect real traffic offenses, measure speeds, or connect to LTO, police, traffic-camera networks, or payment systems.
+- The **Run simulation** form creates explicitly labeled synthetic demo data. The **Record incident** form captures an officer's *manual sample observations*, not validated camera evidence.
+- Approval means human verification **within the academic prototype**, never a legal citation, penalty, or official enforcement decision.
+- Evidence is stored as text and, optionally, a user-provided **HTTPS URL** to externally hosted authorized sample material. It does not upload footage or use Supabase Storage.
+- Notifications are **in-app only**. No email/SMS/push delivery is claimed.
+- The road location is a free-text sample location. No GIS/geofencing or location verification is included yet. Additional SDD/ERD requirements can be reconciled when provided.
 
-## Technology
+## Roles and permissions
 
-- Python 3.11+ and Django 5.2 LTS
-- Supabase-hosted PostgreSQL for actual application storage
-- Django session-based authentication, built-in password hashing, CSRF protection
-- HTML and CSS templates; no third-party front-end framework required
+| Action | Traffic Officer | Administrator |
+| --- | --- | --- |
+| Register publicly | Yes, Officer role only | Admin is created securely through `createsuperuser` |
+| Access own dashboard/profile | Yes | Yes |
+| Create vehicle and pending incident | Yes, owned records | Yes, owned records |
+| View vehicle/incident records | Own only | All |
+| Edit/delete pending incident | Own only | Own only |
+| Edit/delete vehicle | Own only; deletion blocked if linked to any incident | Own only; same safeguards |
+| Approve or reject incident | No | Yes, any pending incident |
+| View verified incidents | Own only | All |
+| View, mark read and delete alerts | Own alerts only | Own alerts only |
 
-Django handles sign-in and stores its Django auth/session tables in Supabase PostgreSQL. **Supabase Auth and Supabase public/secret API keys are not used or required** for this server-side configuration.
+Reviewed incidents are locked to prevent changing or deleting the evidence after a decision. Verified rows remain stored separately. Privileges are checked on the server; hiding a navigation link is not the security boundary.
 
-## Setup (Windows PowerShell)
+## Data model and persistence
 
-1. Create a free/appropriate **Supabase** project and save its database password.
-2. In your Supabase project, click **Connect** and copy the **Session pooler** PostgreSQL URL (normally port `5432`). This option works on IPv4-only networks. The URL must be copied from *your own* dashboard because the pooler host and username vary by project. `sslmode=require` is enabled by default.
-3. Open the extracted project folder in Visual Studio Code and run:
+`accounts.User` owns `VehicleRecord` and `ViolationIncident` rows via `created_by` ForeignKeys. `ViolationIncident.vehicle` links to its vehicle. Approving an incident creates one `VerifiedViolation` row (`OneToOneField`). `AlertNotification` has a recipient `User` ForeignKey and an incident ForeignKey. All records use the Django ORM and are stored in Supabase PostgreSQL when running normally. See [docs/PD2_IMPLEMENTATION.md](docs/PD2_IMPLEMENTATION.md).
+
+## Requirements
+
+- Windows PowerShell (commands below) and Python 3.11 or newer.
+- `requirements.txt` containing Django 5.2 LTS, PostgreSQL driver, `dj-database-url`, and `python-dotenv`.
+- The existing Supabase PostgreSQL project and its password (server-side, in `.env` only).
+- A user account with the Administrator role (`python manage.py createsuperuser`) and at least one Traffic Officer account for the full demo.
+
+## Continue your existing project (Windows PowerShell)
+
+**Do not delete your existing `.env` or Supabase database. Do not recreate the custom user model.** Apply this PD2 source code to the existing repository via the complete-module feature-branch workflow, or copy the full project source into your local project **after making a backup**.
+
+From the Django project directory containing `manage.py`:
 
 ```powershell
-py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-Copy-Item .env.example .env
-```
-
-4. Open `.env` locally and replace `DJANGO_SECRET_KEY` with a long random string. You can generate one with:
-
-```powershell
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
-
-5. In `.env`, replace the **entire** sample `DATABASE_URL` with your real Supabase PostgreSQL connection string. **Do not paste your `.env` or database password into GitHub or public chats.** Percent-encode URL-special characters in a password if needed.
-6. Create the tables in Supabase and create the initial administrator:
-
-```powershell
+python manage.py check
 python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
+python manage.py runserver 127.0.0.1:8001
 ```
 
-7. Open `http://127.0.0.1:8000/`.
+Use port `8001` since Windows previously blocked port `8000` on this machine. Open `http://127.0.0.1:8001/`. Migration `violations.0001_initial` creates the new tables in the existing PostgreSQL database without deleting PD1 account data. Do not use `flush`, `reset`, or `migrate zero`.
 
-- `http://127.0.0.1:8000/register/` - new officer registration
-- `http://127.0.0.1:8000/login/` - login for both roles
-- `http://127.0.0.1:8000/dashboard/` - role-based redirect
-- `http://127.0.0.1:8000/dashboard/officer/` - officer only
-- `http://127.0.0.1:8000/dashboard/admin/` - administrator only
-- `http://127.0.0.1:8000/profile/` - personal profile
-- `http://127.0.0.1:8000/admin/` - Django administration (staff only)
+For a brand-new local clone that lacks `.env`, make the sample copy and **fill your own values locally** (not GitHub):
 
-**Important:** Run migrations before creating accounts. The custom user model is defined in the **initial migration**. Do not switch `AUTH_USER_MODEL` after data has been created.
+```powershell
+Copy-Item .env.example .env
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
 
-## Supabase notes
+Set `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=True`, `DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1`, and `DATABASE_URL` using **Supabase > Connect > Session pooler > URI**. URL-encode special password characters. SSL is required by the Django database settings. Keep `.env` private.
 
-- The `DATABASE_URL` is a **server-side PostgreSQL password**. Do not expose it in HTML, JavaScript or Git commits.
-- Session pooler is preferred for local IPv4 networks; use direct PostgreSQL if your deployment supports IPv6 and direct access.
-- The DB driver requires encrypted connections (`sslmode=require`); for deployments where you configure certificate verification, follow Supabase's `verify-full` guidance.
-- For production deployment, set `DJANGO_DEBUG=False`, configure `DJANGO_ALLOWED_HOSTS` and HTTPS, and secure the reverse proxy. `DJANGO_TRUSTED_PROXY_SSL=1` should only be used if your own trusted proxy sets the forwarded protocol header.
+If you already created a superuser for PD1, you **do not need another one**. Otherwise run `python manage.py createsuperuser` after migrations.
 
-Official references:
-- https://supabase.com/docs/guides/database/connecting-to-postgres
-- https://docs.djangoproject.com/en/5.2/topics/auth/default/
-- https://docs.djangoproject.com/en/5.2/topics/auth/customizing/
+### Primary pages
 
-## Automated tests (no live Supabase credentials needed)
+- `/register/`, `/login/`, `/dashboard/`, `/profile/` — original Account Management.
+- `/violations/vehicles/` — vehicle records and filters.
+- `/violations/vehicles/add/` — new vehicle record.
+- `/violations/incidents/` — possible incidents with type/status/search filters.
+- `/violations/incidents/add/` — manual sample entry.
+- `/violations/incidents/simulate/` — test-only simulated detection.
+- `/violations/review/` — Administrator review queue (officers receive HTTP 403).
+- `/violations/verified/` — stored verified violations.
+- `/violations/alerts/` — private alert inbox.
 
-The test suite runs against temporary SQLite only when an explicit test flag is enabled. **This flag is for automated tests, not the actual app configuration.**
+### End-to-end demo
+
+1. Log in as a **Traffic Officer**, open **Vehicles**, add a sample plate identifier (for example, `ABC 1234`).
+2. Choose **Run simulation** or **Record incident**, select your saved vehicle, select one of the three supported violation types, enter a Cebu road, set a past time, and submit. A **Pending** row is saved in Supabase PostgreSQL.
+3. Log out and log in as an **Administrator**. Open **My alerts** (a new pending incident alert appears), then **Review queue**. Read the sample evidence and approve or reject with a written reason.
+4. Approved incidents appear in **Verified violations**. A rejection has a saved decision but no verified row.
+5. Log back in as the **Traffic Officer**, open **My alerts** to see the decision, then **My incidents** to see the locked reviewed record. Verify another officer cannot view your private records.
+6. Use the list/search/filter pages and test editing/deleting an **unreviewed** record. Reviewed records and linked vehicle rows cannot be deleted.
+
+## Automated tests
+
+Run without real Supabase credentials by explicitly using SQLite **only for automated tests**:
 
 ```powershell
 $env:ROADGUARD_TEST_SQLITE="1"
-python manage.py test accounts
 python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test accounts violations
 Remove-Item Env:ROADGUARD_TEST_SQLITE
 ```
 
-The tests cover password hashing, required fields, unique usernames/emails, password confirmation, invalid credentials, protected routes, access denial between roles, POST-only logout, and editing only the signed-in user's profile.
+The tests cover existing account flows and new validation, ownership, CRUD, role restrictions, simulation labeling, approvals/rejections, verified records, notification recipients, POST-only controls, and CSRF handling. **Actual Supabase execution must still be tested locally using your private `.env`.** The isolated test mode does not change the normal Supabase connection.
 
-## GitHub repository requirements
+## GitHub and submission requirements
 
-**Requested public repository name:**
+Use the same **Public** repository: `YMTCIT/CebuRoadGuardAI-Canete-Yanni-G6`.
 
-`CebuRoadGuardAI-Canete-Yanni-G5`
+- `main` contains stable code only. **Do not commit directly to main.**
+- Create `develop` from the existing `main`.
+- Merge `feature/violation-management` (all four WBS 1.3 features together) into `develop` by PR #1.
+- Merge `feature/review-queue-type-filter` (an additive administrator filter plus test) into `develop` by PR #2.
+- After integration and local checks, merge `develop` into `main` via a third PR.
+- Keep both feature branches after merge. Use meaningful commits during each feature branch.
+- `.gitignore` excludes `.env`, other local environments and caches, and generated databases. Check with `git check-ignore -v .env`. `.env.example` uses placeholders only. Never commit secrets or your `venv/`/`.venv/` folder.
+- Updated commands for the **complete-module branch followed by the review-filter improvement branch** are in [docs/PD2_GITHUB_WORKFLOW.md](docs/PD2_GITHUB_WORKFLOW.md).
 
-This uses the project's documented section **G5** and ASCII rendering of the surname **Canete** for a GitHub-friendly repository name. Change the suffix if your instructor requires a different section format.
+**No GitHub PRs are claimed to have been opened or merged by this downloadable source ZIP.** You must execute this workflow in your existing GitHub account.
 
-1. Create a **Public** repository on GitHub with the exact name above (without initializing a second README).
-2. Check `.gitignore` before committing: `.env`, `.env.*` (except `.env.example`), `.venv/`, `venv/`, and `__pycache__/` are excluded.
-3. Commit changes at meaningful development milestones and push **regularly as work continues**. Do not manufacture earlier dates or claim work was committed when it was not.
-4. Example to publish your current baseline from inside the extracted project folder:
+## PD2 completion report
 
-```powershell
-git init
-git branch -M main
-git add .
-git status
-git commit -m "Implement RoadGuard account feature with Django and Supabase"
-git remote add origin https://github.com/YOUR_GITHUB_USERNAME/CebuRoadGuardAI-Canete-Yanni-G5.git
-git push -u origin main
-```
-
-5. For **future genuine changes**, commit and push each milestone separately, for example:
-
-```powershell
-git add accounts/ templates/ static/
-git commit -m "Improve officer registration and dashboard validation"
-git push
-```
-
-Your public GitHub repository, remote permissions, and commit history require **your own GitHub account**. This ZIP does not create or publish a repository on your behalf.
-
-## Project structure
-
-```text
-CebuRoadGuardAI-Canete-Yanni-G5/
-|-- manage.py
-|-- requirements.txt
-|-- .env.example
-|-- .gitignore
-|-- README.md
-|-- roadguard/               # settings, project URLs, WSGI/ASGI
-|-- accounts/                # custom user, forms, views, guards, tests, migrations
-|-- templates/               # auth forms, role dashboards, profile, 403 page
-`-- static/css/styles.css
-```
-
-## Submission checklist
-
-- [ ] Registered officer account validates inputs, stores a hashed password, and logs in successfully.
-- [ ] Administrator created via `createsuperuser` sees a separate admin dashboard.
-- [ ] Both roles are blocked from the other's dashboard URL (403).
-- [ ] Login-only routes redirect unauthenticated visitors to login.
-- [ ] Profile edits affect only the signed-in user.
-- [ ] The app uses your actual Supabase PostgreSQL database when not in test mode.
-- [ ] `.env` and virtual environments are not present in your GitHub commits.
-- [ ] `requirements.txt` is present; the GitHub repository is Public.
-- [ ] Commit and push continued work in meaningful increments.
+The requested `PD-Completion-Report-Template.docx` and any additional approval/SDD/ERD documents may be provided later as planned. The final PDF should be named `CebuRoadGuardAI-Canete-Yanni-G6-PD2.pdf` and committed to `docs/` **after actual PR URLs, issues, and test accounts are recorded**. Do not invent completed branches/PRs or account passwords. See [docs/PD2_REPORT_INPUTS.md](docs/PD2_REPORT_INPUTS.md).

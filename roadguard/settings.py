@@ -1,4 +1,4 @@
-"""Settings for the Cebu RoadGuard AI account-feature prototype.
+"""Settings for the Cebu RoadGuard AI Django prototype.
 
 The normal database is Supabase PostgreSQL. SQLite is permitted ONLY when
 ROADGUARD_TEST_SQLITE=1 so the automated tests can run without real secrets.
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts.apps.AccountsConfig",
+    "violations.apps.ViolationsConfig",
 ]
 
 MIDDLEWARE = [

@@ -78,7 +78,7 @@ class AccountFeatureTests(TestCase):
     def test_successful_login_redirects_to_correct_officer_dashboard(self):
         self.create_officer()
         response = self.client.post(reverse("login"), {"username": "officer_existing", "password": PASSWORD})
-        self.assertRedirects(response, reverse("dashboard"))
+        self.assertRedirects(response, reverse("dashboard"), fetch_redirect_response=False)
         next_response = self.client.get(reverse("dashboard"))
         self.assertRedirects(next_response, reverse("officer_dashboard"))
         self.assertEqual(self.client.get(reverse("officer_dashboard")).status_code, 200)
@@ -122,6 +122,7 @@ class AccountFeatureTests(TestCase):
         self.assertRedirects(
             self.client.post(url, {"username": "officer_existing", "password": PASSWORD}),
             reverse("dashboard"),
+            fetch_redirect_response=False,
         )
 
     def test_profile_updates_only_current_user(self):
