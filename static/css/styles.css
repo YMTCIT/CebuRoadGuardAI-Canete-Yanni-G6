@@ -100,3 +100,42 @@ p { color:#394c61; }
 .error-page h1 { font-size:34px; margin-top:12px; }
 @media (max-width:850px) { .hero,.auth-layout,.profile-layout { grid-template-columns:1fr; gap:30px; } .hero { min-height:0; } .auth-aside { padding-top:0; } .auth-layout { padding-top:0; } .profile-layout { grid-template-columns:1fr; } .stats-grid { grid-template-columns:1fr 1fr; } }
 @media (max-width:600px) { .shell { width:min(100% - 32px,1140px); } .header-inner { flex-direction:column; padding-block:16px; align-items:stretch; min-height:0; } .nav-links { justify-content:space-between; gap:12px; } .main-content { padding-block:35px 55px; } .panel,.hero-panel { padding:24px; } .form-grid,.content-grid,.stats-grid { grid-template-columns:1fr; } .page-head { flex-direction:column; } .page-head h1 { font-size:31px; } .footer-inner { flex-direction:column; text-align:center; padding-block:18px; gap:8px; } h1 { font-size:37px; } }
+/* PD2 violation management: match the existing RoadGuard account UI. */
+.nav-links { flex-wrap:wrap; justify-content:flex-end; }
+.filter-bar { display:flex; align-items:end; gap:10px; padding-bottom:18px; }
+.filter-bar-wrap { flex-wrap:wrap; }
+.filter-label { display:block; margin-bottom:5px; color:var(--muted); font-size:12px; font-weight:700; }
+.filter-bar input,.filter-bar select,.form-field select,.form-field textarea { display:block; width:100%; min-height:44px; padding:10px 12px; border:1px solid #cad6df; border-radius:9px; background:white; color:var(--ink); font:inherit; }
+.form-field textarea { min-height:105px; resize:vertical; }
+.form-field select:focus,.form-field textarea:focus,.filter-bar input:focus,.filter-bar select:focus { outline:2px solid rgba(12,95,106,.2); border-color:var(--brand); }
+.form-panel { max-width:800px; }
+.form-panel .form-field { margin-bottom:22px; }
+.compact-actions { margin:0; }
+.table-scroll { overflow:auto; }
+.data-table { width:100%; border-collapse:collapse; text-align:left; min-width:600px; }
+.data-table th { color:#647489; font-weight:800; font-size:11px; letter-spacing:.05em; text-transform:uppercase; padding:14px 12px; background:#f2f6f7; }
+.data-table td { padding:17px 12px; border-bottom:1px solid var(--line); font-size:14px; vertical-align:middle; }
+.data-table tr:last-child td { border-bottom:0; }
+.data-table a { font-weight:700; }
+.empty-state { padding:34px 16px !important; text-align:center; color:var(--muted); }
+.status { display:inline-flex; align-items:center; border-radius:999px; font-size:12px; font-weight:700; padding:5px 10px; white-space:nowrap; background:#eef3f5; color:#4d6272; }
+.status-pending { background:#fff5d9; color:#90630a; }
+.status-approved { background:#e3f6eb; color:#256a3e; }
+.status-rejected { background:#ffeded; color:#a13039; }
+.status-simulated { background:#eae7fb; color:#5b4ea1; }
+.status-unread { background:#e7f2ff; color:#1f5c9f; }
+.detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:25px; margin:0; }
+.detail-grid dt { color:#677a8c; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+.detail-grid dd { margin:6px 0 0; overflow-wrap:anywhere; font-size:15px; }
+.detail-full { grid-column:1/-1; }
+.section-gap { margin-top:22px; }
+.confirm-panel { max-width:700px; margin:30px auto; }
+.confirm-panel h1 { font-size:35px; }
+.button-danger { background:#a82737; color:#fff; }
+.button-danger:hover { background:#8b1e2b; }
+.button[disabled] { cursor:not-allowed; opacity:.45; transform:none; }
+.notification-unread { border-left:4px solid var(--brand); }
+.notification-meta { color:#6d7a8b; font-size:12px; }
+.dashboard-actions { margin-top:18px; }
+@media (max-width:850px) { .detail-grid { grid-template-columns:1fr; } .detail-full { grid-column:auto; } }
+@media (max-width:600px) { .filter-bar { align-items:stretch; flex-direction:column; } .filter-bar>div { width:100%; } .filter-bar>.button { width:100%; } .nav-links { gap:8px 15px; } }

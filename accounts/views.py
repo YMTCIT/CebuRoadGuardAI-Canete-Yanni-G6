@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from .forms import ProfileForm, RegistrationForm, RoadGuardAuthenticationForm
 from .models import User
 from .permissions import role_required
+from violations.models import VehicleRecord, ViolationIncident
 
 
 def home(request):
@@ -62,13 +63,20 @@ def admin_dashboard(request):
     context = {
         "officer_count": User.objects.filter(role=User.Role.OFFICER, is_staff=False).count(),
         "admin_count": User.objects.filter(role=User.Role.ADMIN, is_staff=True).count(),
+        "pending_count": ViolationIncident.objects.filter(status=ViolationIncident.Status.PENDING).count(),
+        "vehicle_count": VehicleRecord.objects.count(),
     }
     return render(request, "accounts/admin_dashboard.html", context)
 
 
 @role_required(User.Role.OFFICER)
 def officer_dashboard(request):
-    return render(request, "accounts/officer_dashboard.html")
+    context = {
+        "my_vehicle_count": VehicleRecord.objects.filter(created_by=request.user).count(),
+        "my_incident_count": ViolationIncident.objects.filter(created_by=request.user).count(),
+        "my_pending_count": ViolationIncident.objects.filter(created_by=request.user, status=ViolationIncident.Status.PENDING).count(),
+    }
+    return render(request, "accounts/officer_dashboard.html", context)
 
 
 @login_required

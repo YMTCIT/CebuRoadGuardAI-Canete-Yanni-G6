@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Suspected violations | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">1.3.1 Violation Detection</span><h1>Suspected incidents</h1><p class="lead">Search pending and reviewed incidents. No record is an official citation.</p></div><div class="actions compact-actions"><a class="button button-primary" href="{% url 'violations:incident_create' %}">+ Record incident</a><a class="button button-outline" href="{% url 'violations:incident_simulate' %}">Run simulation</a></div></div>
+<section class="panel">
+<form method="get" class="filter-bar filter-bar-wrap">
+  <div><label class="filter-label" for="incident-query">Plate or road</label><input id="incident-query" name="q" maxlength="100" placeholder="Search" value="{{ query }}"></div>
+  <div><label class="filter-label" for="incident-status">Status</label><select id="incident-status" name="status"><option value="">All statuses</option>{% for value,label in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div><label class="filter-label" for="incident-type">Type</label><select id="incident-type" name="type"><option value="">All types</option>{% for value,label in violation_types %}<option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <button class="button button-outline" type="submit">Filter</button><a class="button button-outline" href="{% url 'violations:incident_list' %}">Clear</a>
+</form>
+<div class="table-scroll"><table class="data-table"><thead><tr><th>ID</th><th>Vehicle</th><th>Suspected violation</th><th>Road location</th><th>Source</th><th>Status</th><th>Open</th></tr></thead><tbody>
+{% for incident in incidents %}<tr><td>#{{ incident.pk }}</td><td>{{ incident.vehicle.plate_number }}</td><td>{{ incident.get_violation_type_display }}</td><td>{{ incident.road_location }}</td><td>{% if incident.source == 'SIMULATED' %}<span class="status status-simulated">Simulation</span>{% else %}Manual sample{% endif %}</td><td><span class="status status-{{ incident.status|lower }}">{{ incident.get_status_display }}</span></td><td><a href="{% url 'violations:incident_detail' incident.pk %}">View</a></td></tr>
+{% empty %}<tr><td colspan="7" class="empty-state">No incidents match the selected filters.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}
