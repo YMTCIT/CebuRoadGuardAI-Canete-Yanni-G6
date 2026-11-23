@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }} | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">1.3.1 Violation Detection</span><h1>{{ page_title }}</h1><p class="lead">{% if simulated %}Generate a clearly labeled demo incident; this does not run AI or contact a camera.{% else %}Capture suspected violation details and supporting observations for human review.{% endif %}</p></div><a class="button button-outline" href="{% url 'violations:incident_list' %}">Back to incidents</a></div>
+{% if simulated %}<div class="notice"><strong>Simulation only.</strong> Pressing the button below creates a mock detection and a pending record in the database. It does not verify actual traffic behavior.</div>{% endif %}
+{% if not has_vehicles %}<div class="notice"><strong>Vehicle required:</strong> Create one of your own vehicle records before recording an incident. <a href="{% url 'violations:vehicle_create' %}">Add vehicle now</a>.</div>{% endif %}
+<section class="panel form-panel section-gap"><form method="post" novalidate>{% csrf_token %}{% include 'violations/_form_fields.html' %}<div class="actions"><button type="submit" class="button button-primary" {% if not has_vehicles %}disabled{% endif %}>{% if simulated %}Create simulated detection{% else %}Save pending incident{% endif %}</button><a href="{% url 'violations:incident_list' %}" class="button button-outline">Cancel</a></div></form></section>
+{% endblock %}

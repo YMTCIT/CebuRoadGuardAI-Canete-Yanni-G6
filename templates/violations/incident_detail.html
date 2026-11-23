@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Incident #{{ incident.pk }} | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">Incident #{{ incident.pk }}</span><h1>{{ incident.get_violation_type_display }}</h1><p class="lead">Suspected traffic violation record for human verification.</p></div><span class="status status-{{ incident.status|lower }}">{{ incident.get_status_display }}</span></div>
+{% if incident.source == 'SIMULATED' %}<div class="notice"><strong>Simulated incident.</strong> Generated for academic testing only; no live camera or AI evidence is available.</div>{% endif %}
+<section class="panel section-gap">
+  <h2>Incident details and evidence</h2>
+  <dl class="detail-grid">
+    <div><dt>Vehicle</dt><dd><a href="{% url 'violations:vehicle_detail' incident.vehicle.pk %}">{{ incident.vehicle.plate_number }}</a></dd></div>
+    <div><dt>Recorded by</dt><dd>{{ incident.created_by.username }}</dd></div>
+    <div><dt>Road location</dt><dd>{{ incident.road_location }}</dd></div>
+    <div><dt>Occurred (PH time)</dt><dd>{{ incident.occurred_at|date:'M d, Y g:i A' }}</dd></div>
+    <div><dt>Record source</dt><dd>{{ incident.get_source_display }}</dd></div>
+    <div><dt>Created</dt><dd>{{ incident.created_at|date:'M d, Y g:i A' }}</dd></div>
+    <div class="detail-full"><dt>Evidence / observation notes</dt><dd>{{ incident.evidence_notes|linebreaksbr }}</dd></div>
+    <div class="detail-full"><dt>Sample evidence URL</dt><dd>{% if incident.evidence_url %}<a href="{{ incident.evidence_url }}" target="_blank" rel="noopener noreferrer">Open external sample evidence</a>{% else %}No external evidence link attached.{% endif %}</dd></div>
+  </dl>
+  {% if incident.is_pending and incident.created_by_id == user.pk %}<div class="actions"><a class="button button-outline" href="{% url 'violations:incident_edit' incident.pk %}">Edit pending incident</a><a class="button button-danger" href="{% url 'violations:incident_delete' incident.pk %}">Delete pending incident</a></div>{% endif %}
+</section>
+{% if incident.reviewed_at %}<section class="panel section-gap"><h2>Human review decision</h2><dl class="detail-grid"><div><dt>Review result</dt><dd>{{ incident.get_status_display }}</dd></div><div><dt>Reviewed by</dt><dd>{{ incident.reviewed_by.username }}</dd></div><div><dt>Reviewed on</dt><dd>{{ incident.reviewed_at|date:'M d, Y g:i A' }}</dd></div><div class="detail-full"><dt>Reviewer notes</dt><dd>{{ incident.review_notes|linebreaksbr }}</dd></div>{% if incident.status == 'APPROVED' %}<div class="detail-full"><dt>Verification</dt><dd>A separate verified-violation record was saved; this is NOT a legal citation.</dd></div>{% endif %}</dl></section>{% endif %}
+
+{% endblock %}

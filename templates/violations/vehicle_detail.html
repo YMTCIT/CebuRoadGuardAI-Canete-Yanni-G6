@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Vehicle {{ vehicle.plate_number }} | Cebu RoadGuard AI{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">Vehicle #{{ vehicle.pk }}</span><h1>{{ vehicle.plate_number }}</h1><p class="lead">Stored vehicle record and linked incidents.</p></div><a class="button button-outline" href="{% url 'violations:vehicle_list' %}">All vehicles</a></div>
+<section class="panel"><dl class="detail-grid"><div><dt>Recorded by</dt><dd>{{ vehicle.created_by.username }}</dd></div><div><dt>Created</dt><dd>{{ vehicle.created_at|date:'M d, Y g:i A' }}</dd></div><div class="detail-full"><dt>Notes</dt><dd>{{ vehicle.description|default:'No notes added.'|linebreaksbr }}</dd></div></dl>
+  {% if vehicle.created_by_id == user.pk %}<div class="actions"><a class="button button-outline" href="{% url 'violations:vehicle_edit' vehicle.pk %}">Edit vehicle</a><a class="button button-danger" href="{% url 'violations:vehicle_delete' vehicle.pk %}">Delete vehicle</a></div>{% endif %}
+</section>
+<section class="panel section-gap"><h2>Linked incidents</h2><div class="table-scroll"><table class="data-table"><thead><tr><th>Incident</th><th>Suspected violation</th><th>Location</th><th>Status</th></tr></thead><tbody>{% for incident in incidents %}<tr><td><a href="{% url 'violations:incident_detail' incident.pk %}">#{{ incident.pk }}</a></td><td>{{ incident.get_violation_type_display }}</td><td>{{ incident.road_location }}</td><td><span class="status status-{{ incident.status|lower }}">{{ incident.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="4">No linked incidents yet.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

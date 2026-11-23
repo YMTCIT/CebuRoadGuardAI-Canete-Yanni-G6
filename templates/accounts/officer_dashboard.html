@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}Traffic Officer Dashboard | Cebu RoadGuard AI{% endblock %}
 {% block content %}
-<div class="page-head"><div><span class="eyebrow">Traffic officer workspace</span><h1>Hello, {{ user.first_name|default:user.username }}.</h1><p class="lead">Your secure RoadGuard officer account is ready to use.</p></div><span class="role-pill">Traffic Officer</span></div>
-<div class="content-grid">
-  <section class="panel"><span class="eyebrow">Available now</span><h2>My profile</h2><p>Review or update your own name, email address, and contact number.</p><a class="button button-primary" href="{% url 'profile' %}">View my profile</a></section>
-  <section class="panel"><span class="eyebrow">Planned features</span><h2>Traffic management</h2><p>Camera monitoring, possible violation review, vehicle records, alerts, and reporting belong to the approved future modules. They are not active in this account-feature release.</p></section>
+<div class="page-head"><div><span class="eyebrow">Traffic officer workspace</span><h1>Hello, {{ user.first_name|default:user.username }}.</h1><p class="lead">Register suspected road incidents and track their review status.</p></div><span class="role-pill">Traffic Officer</span></div>
+<div class="stats-grid">
+  <article class="stat"><div class="small-label">MY VEHICLES</div><strong>{{ my_vehicle_count }}</strong><p>Saved vehicle identifiers</p></article>
+  <article class="stat"><div class="small-label">MY INCIDENTS</div><strong>{{ my_incident_count }}</strong><p>Recorded suspected incidents</p></article>
+  <article class="stat"><div class="small-label">PENDING REVIEW</div><strong>{{ my_pending_count }}</strong><p>Awaiting administrator decision</p></article>
 </div>
-<div class="notice"><strong>Human verification is required.</strong> The future monitoring prototype is designed to support officer review rather than automatically issue legal traffic tickets or fines.</div>
+<div class="content-grid">
+  <section class="panel"><span class="eyebrow">1.3.1 Violation Detection</span><h2>Capture a suspected violation</h2><p>Record a manual sample or generate a clearly labeled simulated detection. Every record is linked to your account.</p><div class="actions"><a class="button button-primary" href="{% url 'violations:incident_create' %}">Record incident</a><a class="button button-outline" href="{% url 'violations:incident_simulate' %}">Simulate</a></div></section>
+  <section class="panel"><span class="eyebrow">1.3.3 Vehicle Record Management</span><h2>Manage your vehicle records</h2><p>Add vehicle identifiers, search records, and open linked incidents.</p><div class="actions"><a class="button button-primary" href="{% url 'violations:vehicle_list' %}">My vehicles</a><a class="button button-outline" href="{% url 'profile' %}">My profile</a></div></section>
+</div><div class="notice"><strong>Human verification required.</strong> Pending incidents have no official legal status.</div>
 {% endblock %}
