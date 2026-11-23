@@ -92,3 +92,19 @@ class IncidentForm(forms.ModelForm):
         if value and not value.lower().startswith("https://"):
             raise forms.ValidationError("Use an HTTPS evidence link to protect the connection.")
         return value
+
+
+class IncidentReviewForm(forms.Form):
+    decision = forms.ChoiceField(
+        choices=(
+            (ViolationIncident.Status.APPROVED, "Approve as verified (prototype only)"),
+            (ViolationIncident.Status.REJECTED, "Reject suspected incident"),
+        ),
+        label="Review decision",
+    )
+    review_notes = forms.CharField(
+        min_length=12, max_length=2000,
+        widget=forms.Textarea(attrs={"rows": 4}),
+        label="Reason / review notes",
+        help_text="Describe the evidence assessment (12-2000 characters). This decision is saved permanently.",
+    )

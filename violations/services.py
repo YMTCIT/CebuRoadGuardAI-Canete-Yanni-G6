@@ -46,3 +46,52 @@ def save_new_incident(*, form, user, simulated=False):
     if alerts:
         AlertNotification.objects.bulk_create(alerts, ignore_conflicts=True)
     return incident
+
+
+class ReviewConflict(Exception):
+    """Another review already completed; do not overwrite historical decisions."""
+
+
+@transaction.atomic
+def decide_incident(*, incident_id, reviewer, decision, notes):
+    """Persist administrator decision, verified row, and creator alert atomically."""
+    from django.core.exceptions import PermissionDenied
+    from django.utils import timezone
+    from .models import VerifiedViolation
+
+    if not reviewer.is_roadguard_admin:
+        raise PermissionDenied("Only RoadGuard administrators can verify incidents.")
+    if decision not in (ViolationIncident.Status.APPROVED, ViolationIncident.Status.REJECTED):
+        raise ValueError("Unsupported review decision")
+    notes = (notes or "").strip()
+    if len(notes) < 12:
+        raise ValueError("A reason with at least 12 characters is required")
+
+    incident = ViolationIncident.objects.select_for_update().get(pk=incident_id)
+    if not incident.is_pending:
+        raise ReviewConflict("This incident has already been reviewed. The original decision was retained.")
+
+    now = timezone.now()
+    incident.status = decision
+    incident.reviewed_by = reviewer
+    incident.reviewed_at = now
+    incident.review_notes = notes
+    incident.save(update_fields=["status", "reviewed_by", "reviewed_at", "review_notes", "updated_at"])
+
+    if decision == ViolationIncident.Status.APPROVED:
+        VerifiedViolation.objects.create(incident=incident, verified_by=reviewer, verified_at=now)
+        kind = AlertNotification.Kind.APPROVED
+        title = f"Incident #{incident.pk} approved after review"
+        body = "An authorized administrator verified your recorded incident in the prototype. No legal citation was issued."
+    else:
+        kind = AlertNotification.Kind.REJECTED
+        title = f"Incident #{incident.pk} rejected after review"
+        body = "An authorized administrator rejected your suspected incident. See the saved review notes."
+
+    AlertNotification.objects.get_or_create(
+        recipient=incident.created_by,
+        incident=incident,
+        kind=kind,
+        defaults={"title": title, "content": body},
+    )
+    return incident
